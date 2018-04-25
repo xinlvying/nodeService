@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec \"NODE_ENV=development node --harmony index.js\""
+    "dev": "nodemon --exec \"NODE_ENV=development node --harmony index.js --db_username chunkyboy --db_password chunkyboy921018\""
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
   "dependencies": {
     "express": "^4.16.3",
     "helmet": "^3.12.0",
+    "jsonwebtoken": "^8.2.1",
     "mongoose": "^5.0.16",
+    "mongoose-auto-increment-fix": "^5.0.2",
     "mongoose-paginate": "^5.0.3",
     "yargs": "^11.0.0"
   }

@@ -1,10 +1,12 @@
 const argv = require('yargs').argv;
 
 exports.MONGODB = {
-  uri: `mongodb://127.0.0.1:${argv.dbport || '27017'}/RN`,
+  uri: `mongodb://www.sxin.tech:${argv.dbport || '27017'}/reactnative`,
   username: argv.db_username || '',
   password: argv.db_password || ''
 }
+
+console.log(argv)
 
 exports.APP = {
   ROOT_PATH: __dirname,

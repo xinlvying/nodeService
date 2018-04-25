@@ -9,6 +9,7 @@ exports.handleRequest = ({ req, res, controller }) => {
   const support = !!controller[method];
   support && controller[method](req, res);
   support || res.status(405).jsonp({ code: 0, message: '不支持该请求类型！' });
+  
 };
 
 exports.handleError = ({ res, message = '请求失败', err = null, code }) => {

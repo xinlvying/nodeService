@@ -1,5 +1,5 @@
 /*
-* 分类数据模型
+* 咨询师数据模型
 */
 
 const mongoose = require('../rn-core/mongodb').mongoose;
@@ -9,20 +9,26 @@ const mongoosePaginate = require('mongoose-paginate');
 // 自增ID初始化
 autoIncrement.initialize(mongoose.connection);
 
-// 分类集合模型
-const categorySchema = new mongoose.Schema({
+// 咨询师集合模型
+const consultantSchema = new mongoose.Schema({
 
-  // 分类名称
+  // 咨询师名称
   name: { type: String, required: true, validate: /\S+/ },
 
-  // 别名
-  // slug: { type: String, required: true, validate: /\S+/ },
+  // 性别
+  gender: { type: String, required: true },
 
-  // 分类描述
+  // 照片
+  photo: { type: String, required: true },
+
+  // 咨询方向
+  field: { type: String, required: true },
+
+  // 值班时间
+  onduty_time: { type: Date },
+
+  // 咨询师简介
   description: String,
-
-  // 父分类ID
-  pid: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
 
   // 创建时间
   create_at: { type: Date, default: Date.now },
@@ -37,11 +43,11 @@ const categorySchema = new mongoose.Schema({
   }]
 });
 
-categorySchema.set('toObject', { getters: true });
+consultantSchema.set('toObject', { getters: true });
 
 // 翻页 + 自增ID插件配置
-categorySchema.plugin(mongoosePaginate);
-categorySchema.plugin(autoIncrement.plugin, {
+consultantSchema.plugin(mongoosePaginate);
+consultantSchema.plugin(autoIncrement.plugin, {
   model: 'Category',
   field: 'id',
   startAt: 1,
@@ -49,13 +55,13 @@ categorySchema.plugin(autoIncrement.plugin, {
 });
 
 // 时间更新
-categorySchema.pre('findOneAndUpdate', function (next) {
+consultantSchema.pre('findOneAndUpdate', function (next) {
   this.findOneAndUpdate({}, { update_at: Date.now() });
   next();
 });
 
 // 分类模型
-const Category = mongoose.model('Category', categorySchema);
+const Consultant = mongoose.model('Consultant', consultantSchema);
 
 // export
-module.exports = Category;
+module.exports = Consultant;

@@ -81,37 +81,16 @@ const routes = app => {
   // // 全局option
   // app.all('/option', controller.option);
 
-  // // sitemap
-  // app.get('/sitemap.xml', controller.sitemap);
-
   // // like
   // app.post('/like', controller.like);
 
-  // // github
-  // app.all('/github', controller.github);
-
-  // // music
-  // app.get('/music/pic/:pic_id', controller.music.pic);
-  // app.get('/music/lrc/:song_id', controller.music.lrc);
-  // app.get('/music/url/:song_id', controller.music.url);
-  // app.get('/music/song/:song_id', controller.music.song);
-  // app.get('/music/list/:play_list_id', controller.music.list);
-
-  // // Tag
-  // app.all('/tag', controller.tag.list);
-  // app.all('/tag/:tag_id', controller.tag.item);
-
-  // // Category
-  // app.all('/category', controller.category.list);
-  // app.all('/category/:category_id', controller.category.item);
-
-  // // 评论
-  // app.all('/comment', controller.comment.list);
-  // app.all('/comment/:comment_id', controller.comment.item);
+  // Category
+  app.all('/category', controller.category.list);
+  app.all('/category/:category_id', controller.category.item);
 
   // Article
   app.all('/article', controller.article.list);
-  // app.all('/article/:article_id', controller.article.item);
+  app.all('/article/:article_id', controller.article.item);
 
   // announcement
   // app.all('/announcement', controller.announcement.list);
