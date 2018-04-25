@@ -4,7 +4,8 @@
   "description": "The service of react-native app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --exec \"NODE_ENV=development node --harmony index.js\""
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/xinlvying/nodeService/issues"
   },
-  "homepage": "https://github.com/xinlvying/nodeService#readme"
+  "homepage": "https://github.com/xinlvying/nodeService#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "helmet": "^3.12.0",
+    "mongoose": "^5.0.16",
+    "mongoose-paginate": "^5.0.3",
+    "yargs": "^11.0.0"
+  }
 }
