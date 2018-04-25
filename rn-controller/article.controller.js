@@ -5,18 +5,17 @@
 const config = require('../app.config');
 
 const { handleRequest, handleError, handleSuccess } = require('../rn-utils/handler');
-// const authIsVerified = require('np-utils/np-auth');
+const authIsVerified = require('../rn-utils/authentication');
 
 const Category = require('../rn-model/article.category.model');
 const Article = require('../rn-model/article.model');
-// const Tag = require('np-model/tag.model');
 
 const articleCtrl = { list: {}, item: {} };
 
 // 获取文章列表
 articleCtrl.list.GET = (req, res) => {
 
-  let { page, per_page, state, public, keyword, category, category_slug, tag, tag_slug, date, hot } = req.query;
+  let { page, per_page, state, public, keyword, category, date } = req.query;
 
   // 过滤条件
   const options = {
@@ -24,7 +23,7 @@ articleCtrl.list.GET = (req, res) => {
     page: Number(page || 1),
     limit: Number(per_page || 10),
     populate: ['category', 'tag'],
-    select: '-password -content'
+    // select: '-password -content'
   };
 
   // 查询参数
@@ -60,14 +59,6 @@ articleCtrl.list.GET = (req, res) => {
     querys.category = category;
   };
 
-  // 热评查询
-  if (!!hot) {
-    options.sort = {
-      'meta.comments': -1,
-      'meta.likes': -1
-    };
-  };
-
   // 时间查询
   if (date) {
     const getDate = new Date(date);
@@ -80,10 +71,10 @@ articleCtrl.list.GET = (req, res) => {
   };
 
   // 如果是前台请求，则重置公开状态和发布状态
-  // if (!authIsVerified(req)) {
-  //   querys.state = 1;
-  //   querys.public = 1;
-  // };
+  if (!authIsVerified(req)) {
+    querys.state = 1;
+    querys.public = 1;
+  };
 
   // 请求对应文章
   const getArticles = () => {
@@ -108,47 +99,12 @@ articleCtrl.list.GET = (req, res) => {
       })
   };
 
-  // 分类别名查询 - 根据别名查询到id，然后根据id查询
-  if (category_slug) {
-    Category.find({ slug: category_slug })
-      .then(([category] = []) => {
-        if (category) {
-          querys.category = category._id;
-          getArticles();
-        } else {
-          handleError({ res, message: '分类不存在' });
-        }
-      })
-      .catch(err => {
-        handleError({ res, err, message: '分类查找失败' });
-      })
-    return false;
-  };
-
-  // 标签别名查询 - 根据别名查询到id，然后根据id查询
-  if (tag_slug) {
-    Tag.find({ slug: tag_slug })
-      .then(([tag] = []) => {
-        if (tag) {
-          querys.tag = tag._id;
-          getArticles();
-        } else {
-          handleError({ res, message: '标签不存在' });
-        }
-      })
-      .catch(err => {
-        handleError({ res, err, message: '标签查找失败' });
-      })
-    return false;
-  };
-
   // 默认请求文章列表
   getArticles();
 };
 
 // 发布文章
 articleCtrl.list.POST = ({ body: article }, res) => {
-
   // 验证
   if (!article.title || !article.content) {
     handleError({ res, message: '内容不合法' });
@@ -159,8 +115,6 @@ articleCtrl.list.POST = ({ body: article }, res) => {
   new Article(article).save()
     .then((result = article) => {
       handleSuccess({ res, result, message: '文章发布成功' });
-      // buildSiteMap();
-      // baiduSeoPush(`${config.INFO.site}/article/${result.id}`);
     })
     .catch(err => {
       handleError({ res, err, message: '文章发布失败' });

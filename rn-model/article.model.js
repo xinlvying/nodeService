@@ -4,11 +4,11 @@
 */
 
 const mongoose = require('../rn-core/mongodb').mongoose;
-// const autoIncrement = require('mongoose-auto-increment');
+const autoIncrement = require('mongoose-auto-increment-fix');
 const mongoosePaginate = require('mongoose-paginate');
 
 // 自增ID初始化
-// autoIncrement.initialize(mongoose.connection);
+autoIncrement.initialize(mongoose.connection);
 
 // 文章模型
 const articleSchema = new mongoose.Schema({
@@ -44,7 +44,7 @@ const articleSchema = new mongoose.Schema({
   update_at: { type: Date, default: Date.now },
 
   // 文章标签
-  tag: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
+  // tag: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
 
   // 文章分类
   category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
@@ -67,12 +67,12 @@ articleSchema.set('toObject', { getters: true });
 
 // 翻页 插件配置
 articleSchema.plugin(mongoosePaginate)
-// articleSchema.plugin(autoIncrement.plugin, {
-//   model: 'Article',
-//   field: 'id',
-//   startAt: 1,
-//   incrementBy: 1
-// });
+articleSchema.plugin(autoIncrement.plugin, {
+  model: 'Article',
+  field: 'id',
+  startAt: 1,
+  incrementBy: 1
+});
 
 // 时间更新
 articleSchema.pre('findOneAndUpdate', function (next) {

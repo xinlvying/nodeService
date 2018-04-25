@@ -12,9 +12,7 @@ exports.mongoose = mongoose;
 exports.connect = () => {
 
   // 连接数据库
-  mongoose.connect(config.MONGODB.uri, {
-    promiseLibrary: global.Promise
-  });
+  mongoose.connect(config.MONGODB.uri, { user: config.MONGODB.username, pass: config.MONGODB.password });
 
   // 连接错误
   mongoose.connection.on('error', error => {
