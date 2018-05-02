@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec \"NODE_ENV=dev node --harmony index.js\""
+    "dev": "nodemon --exec \"NODE_ENV=dev node --harmony index.js --db_username chunkyboy --db_password chunkyboy921018\""
+
   },
   "repository": {
     "type": "git",
