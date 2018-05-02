@@ -18,7 +18,7 @@ mongodb.connect();
 
 // global options
 mongoosePaginate.paginate.options = {
-	limit: config.APP.LIMIT
+  limit: config.APP.LIMIT
 };
 
 // app config
@@ -26,11 +26,12 @@ app.set('port', config.APP.PORT);
 app.use(helmet());
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'))
 
 // app routes
 routes(app);
 
 // Start server
 http.createServer(app).listen(app.get('port'), () => {
-	console.log(`NodeService Run！port at ${app.get('port')}, env: ${process.env.NODE_ENV}`)
+  console.log(`NodeService Run！port at ${app.get('port')}, env: ${process.env.NODE_ENV}`)
 });

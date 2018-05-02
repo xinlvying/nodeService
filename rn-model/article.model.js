@@ -29,9 +29,9 @@ const articleSchema = new mongoose.Schema({
   thumb: String,
 
   // 文章发布状态 => -1回收站，0草稿，1已发布
-  state: { type: Number, default: 1 },
+  status: { type: Number, default: 1 },
 
-  // 文章公开状态 = // -1私密，0需要密码，1私密
+  // 文章公开状态 = // -1私密，0需要密码，1公开
   public: { type: Number, default: 1 },
 
   // 文章密码 => 加密状态生效
@@ -46,8 +46,11 @@ const articleSchema = new mongoose.Schema({
   // 文章标签
   // tag: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
 
+  // 作者
+  author: String,
+
   // 文章分类
-  category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
 
   // 其他元信息
   meta: {
