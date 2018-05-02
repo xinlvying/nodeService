@@ -13,13 +13,19 @@ autoIncrement.initialize(mongoose.connection);
 const consultRecordSchema = new mongoose.Schema({
 
   // 咨询师名称
-  consultant_name: { type: String, required: true, validate: /\S+/ },
+  consultant_name: { type: mongoose.Schema.Types.ObjectId, ref: 'Consultant', required: true },
 
   // 来访人电话
   visitor_tel: { type: String, required: true, validate: /\S+/ },
 
   // 来访人性别
   visitor_gender: String,
+
+  // 来访人年级
+  visitor_grade: String,
+
+  // 来访人学院
+  visitor_college: String,
 
   // 咨询方向
   field: String,
@@ -51,7 +57,7 @@ consultRecordSchema.set('toObject', { getters: true });
 // 翻页 + 自增ID插件配置
 consultRecordSchema.plugin(mongoosePaginate);
 consultRecordSchema.plugin(autoIncrement.plugin, {
-  model: 'Category',
+  model: 'ConsultantRecord',
   field: 'id',
   startAt: 1,
   incrementBy: 1
@@ -63,8 +69,8 @@ consultRecordSchema.pre('findOneAndUpdate', function (next) {
   next();
 });
 
-// 分类模型
-const Consultant = mongoose.model('Consultant', consultRecordSchema);
+// 咨询记录模型
+const ConsultantRecord = mongoose.model('ConsultantRecord', consultRecordSchema);
 
 // export
-module.exports = Consultant;
+module.exports = ConsultantRecord;

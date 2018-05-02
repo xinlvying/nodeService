@@ -19,7 +19,7 @@ const consultantSchema = new mongoose.Schema({
   gender: { type: String, required: true },
 
   // 照片
-  photo: { type: String, required: true },
+  photo: { type: String },
 
   // 咨询方向
   field: { type: String, required: true },
@@ -48,7 +48,7 @@ consultantSchema.set('toObject', { getters: true });
 // 翻页 + 自增ID插件配置
 consultantSchema.plugin(mongoosePaginate);
 consultantSchema.plugin(autoIncrement.plugin, {
-  model: 'Category',
+  model: 'Consultant',
   field: 'id',
   startAt: 1,
   incrementBy: 1
@@ -60,7 +60,7 @@ consultantSchema.pre('findOneAndUpdate', function (next) {
   next();
 });
 
-// 分类模型
+// 咨询师模型
 const Consultant = mongoose.model('Consultant', consultantSchema);
 
 // export
