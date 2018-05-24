@@ -11,7 +11,6 @@ var TurndownService = require('turndown');
 
 var turndownService = new TurndownService()
 
-// const Category = require('../rn-model/article.category.model');
 const Article = require('../rn-model/article.model');
 
 const articleCtrl = {
@@ -19,6 +18,8 @@ const articleCtrl = {
   admin: {},
   common: {}
 };
+
+let successCount = 0, errorCount = 0; existCount = 0, requstCount = 0;
 
 const appQuerys = {
   status: 1,
@@ -67,7 +68,7 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
 const Find = (querys, option, res, successMsg = '操作成功', errMsg = '操作失败') => {
   Article.find(querys, option)
     .then(data => {
-      console.log(data)
+      // console.log(data)
       handleSuccess({ res, message: '文章获取成功', data });
     })
     .catch(err => handleError({ res, message: '文章获取失败', err }))
@@ -79,7 +80,7 @@ articleCtrl.app.query = new Controller({
   callback: ({ query: { page, per_page } }, res) => {
     // 过滤条件
     const options = {
-      sort: { _id: -1 },
+      sort: { create_at: -1 },
       page: Number(page || 1),
       limit: Number(per_page || 10),
       populate: ['category'],
@@ -118,12 +119,23 @@ articleCtrl.common.querySingle = new Controller({
     let querys = { ...appQuerys, _id: article_id };
 
     // 将内容转换为markdown格式
-    Article.find(querys)
+    // Article.find(querys)
+    //   .then(data => {
+    //     // console.log(data[0].content)
+    //     data[0].content = turndownService.turndown(data[0].content);
+    //     console.log(data[0])
+    //     handleSuccess({ res, message: '文章获取成功', data: data[0] });
+    //   })
+    //   .catch(err => handleError({ res, message: '文章获取失败', err }))
+
+    Article.findOne(querys).populate('category tag').exec()
       .then(data => {
-        // console.log(data[0].content)
-        data[0].content = turndownService.turndown(data[0].content);
-        console.log(data[0])
-        handleSuccess({ res, message: '文章获取成功', data: data[0] });
+        // console.log(data)
+        // 每请求一次，浏览次数都要增加
+        data.meta.views += 1;
+        data.save();
+        data.content = turndownService.turndown(data.content);
+        handleSuccess({ res, message: '文章获取成功', data });
       })
       .catch(err => handleError({ res, message: '文章获取失败', err }))
   }
@@ -136,7 +148,7 @@ articleCtrl.admin.queryCombine = new Controller({
   callback: ({ body }, res) => {
     // 过滤条件
     const options = {
-      sort: { _id: -1 },
+      sort: { create_at: -1 },
       page: Number(body.page || 1),
       limit: Number(body.per_page || 10),
       populate: ['category'],
@@ -165,25 +177,42 @@ articleCtrl.admin.publish = new Controller({
     const saveArticle = () => {
       new Article(article).save()
         .then((result = article) => {
+          successCount++;
+          console.log({ success: successCount });
           handleSuccess({ res, result, message: '文章发布成功' });
         })
         .catch(err => {
+          errorCount++;
+          console.log({ err: errorCount });
+
+          // console.log(article.title)
           handleError({ res, err, message: '文章发布失败' });
         })
     }
 
     // 验证article合法性
     const title = article.title;
-    Article.find({ title })
-      .then(articles => {
-        articles.length && handleError({ res, message: "文章已存在！" });
-        articles.length || saveArticle();
+    const find = Article.find({ title });
+    const promise = find.exec();
+    promise.then(articles => {
+      console.log(articles)
+      if (articles.length) {
+        existCount++;
+        console.log({ exist: existCount });
+        handleError({ res, message: "文章已存在！" });
+      } else saveArticle();
+    })
+      .catch(err => {
+        // console.log(title);
+        errorCount++;
+        console.log({ findErr: errorCount });
+
+        handleError({ res, err, message: '保存失败！' })
       })
-      .catch(err => handleError({ res, err, message: '保存失败！' }))
   }
 });
 
-// 批量修改文章（移回收站、回收站恢复）
+// 修改文章状态（移回收站、回收站恢复）
 articleCtrl.admin.changeStatus = new Controller({
   method: 'PATCH',
   callback: ({ body: { id, status } }, res) => {

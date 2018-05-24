@@ -3,27 +3,28 @@
 */
 
 const config = require('../app.config');
-
+const autoIncrement = require('mongoose-auto-increment-fix');
+const mongoosePaginate = require('mongoose-paginate');
 const mongoose = require('../rn-core/mongodb').mongoose;
 const userSchema = new mongoose.Schema({
 
   // 用户名
-  username: { type: String, default: '' },
+  user_name: { type: String, default: '' },
+
+  // 用户类型 => 0：普通用户,1：管理员
+  user_type: { type: Number, default: 0 },
+
+  // 用户类型 => 0：无效,1：有效
+  user_status: { type: Number, default: 1 },
 
   // 手机号
-  phone: { type: String, default: '' },
+  login_phone: { type: String, required: true, validate: /\S+/ },
 
   // 年级
   grade: { type: String, default: '' },
 
   // 学院
   college: { type: String, default: '' },
-
-  // 签名
-  slogan: { type: String, default: '' },
-
-  // 头像
-  gravatar: { type: String, default: '' },
 
   // 创建时间
   create_at: { type: Date, default: Date.now },
@@ -33,6 +34,15 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.set('toObject', { getters: true });
+
+// 翻页 插件配置
+userSchema.plugin(mongoosePaginate)
+userSchema.plugin(autoIncrement.plugin, {
+  model: 'User',
+  field: 'id',
+  startAt: 1,
+  incrementBy: 1
+});
 
 // 时间更新
 userSchema.pre('findOneAndUpdate', function (next) {

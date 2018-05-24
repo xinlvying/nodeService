@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --exec \"NODE_ENV=dev node --harmony index.js --db_username chunkyboy --db_password dsx921018\""
-
   },
   "repository": {
     "type": "git",
@@ -21,6 +20,7 @@
   "dependencies": {
     "@alicloud/sms-sdk": "^1.0.9",
     "ali-oss": "^5.1.1",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-http-proxy": "^1.2.0",
     "formidable": "^1.2.1",

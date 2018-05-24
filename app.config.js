@@ -2,8 +2,8 @@ const argv = require('yargs').argv;
 
 // 数据库连接参数
 exports.MONGODB = {
-  // uri: `mongodb://www.sxin.tech:${argv.dbport || '27017'}/reactnative`,
-  uri: `mongodb://localhost:${argv.dbport || '27017'}/reactnative`,
+  uri: `mongodb://www.sxin.tech:${argv.dbport || '27017'}/reactnative`,
+  // uri: `mongodb://localhost:${argv.dbport || '27017'}/reactnative`,
   username: argv.db_username || '',
   password: argv.db_password || ''
 }
@@ -36,7 +36,7 @@ exports.USER = {
 exports.APP = {
   ROOT_PATH: __dirname,
   LIMIT: 16,
-  PORT: 8081
+  PORT: 8000
 }
 
 exports.INFO = {

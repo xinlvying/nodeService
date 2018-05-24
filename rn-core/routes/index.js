@@ -2,7 +2,7 @@
  * API路由
  */
 
-
+const bodyParser = require('body-parser');
 const config = require('../../app.config');
 const apiForApp = require('./app.routes');
 const apiForAdmin = require('./admin.routes');
@@ -65,6 +65,8 @@ const routes = app => {
 
     next();
   });
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 1000000 }));
 
   // Api
   app.get('/api', (req, res) => {

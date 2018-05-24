@@ -14,10 +14,7 @@ autoIncrement.initialize(mongoose.connection);
 const articleSchema = new mongoose.Schema({
 
   // 文章标题
-  title: { type: String, required: true, validate: /\S+/ },
-
-  // 文章关键字（SEO）
-  keywords: [{ type: String }],
+  title: { type: String, required: true, unique: true, validate: /\S+/ },
 
   // 文章描述
   description: String,
@@ -43,14 +40,14 @@ const articleSchema = new mongoose.Schema({
   // 最后修改日期
   update_at: { type: Date, default: Date.now },
 
-  // 文章标签
-  // tag: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
-
   // 作者
   author: String,
 
+  // 作者头像
+  authorImg: String,
+
   // 文章分类
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
 
   // 其他元信息
   meta: {

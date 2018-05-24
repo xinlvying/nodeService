@@ -16,7 +16,7 @@ const categorySchema = new mongoose.Schema({
   name: { type: String, required: true, validate: /\S+/ },
 
   // 代码
-  code: { type: String, required: true, validate: /\S+/ },
+  code: { type: String, validate: /\S+/ },
 
   // 分类描述
   description: String,

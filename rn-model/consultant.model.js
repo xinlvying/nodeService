@@ -22,10 +22,13 @@ const consultantSchema = new mongoose.Schema({
   photo: { type: String },
 
   // 咨询方向
-  field: { type: String, required: true },
+  field: { type: String },
 
   // 值班时间
-  onduty_time: { type: Date },
+  onduty_time: [String],
+
+  // 值班星期
+  onduty_day: String,
 
   // 咨询师简介
   description: String,
@@ -34,7 +37,7 @@ const consultantSchema = new mongoose.Schema({
   create_at: { type: Date, default: Date.now },
 
   // 最后修改日期
-  update_at: { type: Date },
+  update_at: { type: Date, default: Date.now },
 
   // 自定义扩展
   extends: [{

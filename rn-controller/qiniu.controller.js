@@ -27,7 +27,7 @@ uploadCtrl.upload = new Controller({
       if (file.type.indexOf('image') == -1) {
         handleError({ res, message: '请上传图片类型文件' });
         return false;
-      } else url = process.env.NODE_ENV == 'dev' ? `http://localhost:${config.APP.PORT}${file.path.substring(6)}` : `http:sxin.tech${file.path.substring(6)}`;;
+      } else url = process.env.NODE_ENV == 'dev' ? `http://sxin.tech:${config.APP.PORT}${file.path.substring(6)}` : `http:sxin.tech${file.path.substring(6)}`;;
     })
 
     form.parse(req, function (err, fields, files) {
