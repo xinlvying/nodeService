@@ -6,14 +6,14 @@
 
 exports.handleRequest = ({ req, res, controller }) => {
   const method = req.method;
-  console.log(method, controller.method)
+  // console.log(method, controller.method)
   const support = (controller.method == method);
   support && controller.callback(req, res);
   support || res.status(405).jsonp({ code: -1, message: '不支持该请求类型！' });
 };
 
 exports.handleError = ({ code, res, err, message = '请求失败' }) => {
-  console.log(err);
+  // console.log(err);
 
   if (code && code > 0) {
     res.status(code).jsonp({ code: -1, message, debug: err });

@@ -24,6 +24,7 @@ router.all(`${path.banner}/update-status`, controller.banner.admin.changeStatus)
 
 // Category
 router.all(`${path.category}`, controller.category.common.query);
+router.all(`${path.category}/:name`, controller.category.common.queryByName);
 router.all(`${path.category}/publish`, controller.category.admin.publish);
 
 // Article
@@ -36,6 +37,19 @@ router.all(`${path.article}/update/:article_id`, controller.article.admin.update
 // 
 router.all('/upload', controller.upload);
 
+// Consultant
+router.all(`${path.consultant}/add`, controller.consultant.admin.add);
+router.all(`${path.consultant}/admin-query`, controller.consultant.admin.queryCombine);
 
+// Calendar
+router.all(`${path.calendar}/query`, controller.calendar.admin.query);
+router.all(`${path.calendar}/add`, controller.calendar.admin.add);
+router.all(`${path.calendar}/single`, controller.calendar.common.single);
+
+// 匿名问题
+router.all(`${path.question}/add`, controller.question.common.add);
+router.all(`${path.question}/admin-query`, controller.question.admin.queryCombine);
+router.all(`${path.question}/update-status`, controller.question.admin.updateStatus);
+// router.all(`${path.question}/:_id`, controller.question.common.querySingle);
 
 module.exports = router;

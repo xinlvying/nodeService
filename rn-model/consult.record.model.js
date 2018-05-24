@@ -12,8 +12,8 @@ autoIncrement.initialize(mongoose.connection);
 // 咨询记录集合模型
 const consultRecordSchema = new mongoose.Schema({
 
-  // 咨询师名称
-  consultant_name: { type: mongoose.Schema.Types.ObjectId, ref: 'Consultant', required: true },
+  // 咨询师ID
+  consultant_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Consultant', required: true },
 
   // 来访人电话
   visitor_tel: { type: String, required: true, validate: /\S+/ },
@@ -30,9 +30,18 @@ const consultRecordSchema = new mongoose.Schema({
   // 咨询方向
   field: String,
 
-  // 咨询时间
-  consult_time: { type: Date, required: true },
+  // 咨询周次
+  consult_week: String,
 
+  // 咨询星期
+  consult_weekday: String,
+
+  // 咨询日期
+  consult_date: { type: Date, required: true },
+
+  // 咨询时间
+  consult_time: { type: String, required: true },
+  
   // 记录状态 => // 1未确认，2已确认，3已咨询，4已取消，5已更改咨询时间
   status: { type: Number, required: true, default: 1 },
 
@@ -57,7 +66,7 @@ consultRecordSchema.set('toObject', { getters: true });
 // 翻页 + 自增ID插件配置
 consultRecordSchema.plugin(mongoosePaginate);
 consultRecordSchema.plugin(autoIncrement.plugin, {
-  model: 'ConsultantRecord',
+  model: 'ConsultRecord',
   field: 'id',
   startAt: 1,
   incrementBy: 1
@@ -65,12 +74,12 @@ consultRecordSchema.plugin(autoIncrement.plugin, {
 
 // 时间更新
 consultRecordSchema.pre('findOneAndUpdate', function (next) {
-  this.findOneAndUpdate({}, { update_at: Date.now() });
+  this.findOneAndUpdate({}, { update_at: new Date(Date.now() - date.getTimezoneOffset() * 60 * 1000) });
   next();
 });
 
 // 咨询记录模型
-const ConsultantRecord = mongoose.model('ConsultantRecord', consultRecordSchema);
+const ConsultRecord = mongoose.model('ConsultRecord', consultRecordSchema);
 
 // export
-module.exports = ConsultantRecord;
+module.exports = ConsultRecord;

@@ -1,5 +1,5 @@
 /**
- * 咨询师控制器
+ * 咨询记录控制器
  */
 
 const Controller = require('../rn-utils/controller.generator');
@@ -7,9 +7,9 @@ const { handleRequest, handleError, handleSuccess } = require('../rn-utils/handl
 const authIsVerified = require('../rn-utils/authentication');
 const config = require('../app.config');
 
-const Consultant = require('../rn-model/consultant.model');
+const ConsultantRecord = require('../rn-model/consult.record.model');
 
-const consultantCtrl = {
+const consultantRecord = {
   app: {},
   admin: {},
   common: {}
@@ -21,7 +21,7 @@ const appQuerys = {
 }
 
 const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '操作失败') => {
-  Consultant.paginate(querys, options)
+  ConsultantRecord.paginate(querys, options)
     .then(result => {
       handleSuccess({
         res,
@@ -42,38 +42,39 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
     })
 }
 
-consultantCtrl.app.queryCombine = new Controller({
-  method: 'POST',
-  callback: ({ body }, res) => {
-    console.log(body);
+consultantRecord.common.queryByTime = new Controller({
+  method: 'GET',
+  callback: ({ params: { consult_time } }, res) => {
+    let date;
+    if (consult_time) date = new Date(consult_time);
+    else handleError({res,message:'参数不能为空'});
     // 请求
-    const find = Consultant.find({ ...body });
-    const promise = find.exec();
 
+    const promise = ConsultantRecord.find({ 'consult_date': { $gte: date } }).exec();
     promise
       .then(data => {
-        handleSuccess({ res, data, message: '咨询师列表获取成功' });
+        // console.log(data)
+        handleSuccess({ res, data, message: '咨询预约记录获取成功' });
       })
       .catch(err => {
-        handleError({ res, err, message: '咨询师列表获取失败' });
+        handleError({ res, err, message: '咨询预约记录获取失败' });
       })
   }
 });
 
-consultantCtrl.admin.add = new Controller({
+consultantRecord.common.add = new Controller({
   method: 'POST',
-  callback: ({ body: consultant }, res) => {
-    console.log(consultant)
+  callback: ({ body: consultantRecord }, res) => {
+    console.log(consultantRecord)
     // 验证
-    if (!consultant.name || !consultant.gender || !consultant.onduty_day ||
-      !consultant.onduty_time || !consultant.description || !consultant.photo) {
+    if (!consultantRecord.visitor_tel || !consultantRecord.consultant_id || !consultantRecord.consult_time ||
+      !consultantRecord.consult_week || !consultantRecord.consult_weekday) {
       handleError({ res, message: '内容不合法' });
       return false;
     }
-
-    // 保存咨询师
-    const saveConsultant = () => {
-      new Consultant(consultant).save()
+    // 保存咨询记录
+    const saveConsultantRecord = () => {
+      new ConsultantRecord(consultantRecord).save()
         .then((result) => {
           handleSuccess({ res, result, message: '保存成功' });
         })
@@ -83,17 +84,20 @@ consultantCtrl.admin.add = new Controller({
     }
 
     // 验证咨询师合法性
-    const name = consultant.name;
-    Consultant.find({ name })
-      .then(consultant => {
-        consultant.length && handleError({ res, message: "该咨询师已存在！" });
-        consultant.length || saveConsultant();
+    let visitor_tel = consultantRecord.visitor_tel;
+    let consultant_id = consultantRecord.consultant_id;
+    let consult_time = consultantRecord.consult_time;
+
+    ConsultantRecord.find({ visitor_tel, consultant_id, consult_time })
+      .then(consultantRecord => {
+        consultantRecord.length && handleError({ res, message: "该预约记录已存在！" });
+        consultantRecord.length || saveConsultantRecord();
       })
       .catch(err => handleError({ res, err, message: err }))
   }
 });
 
-consultantCtrl.admin.queryCombine = new Controller({
+consultantRecord.admin.queryCombine = new Controller({
   method: 'POST',
   callback: ({ body }, res) => {
     // 过滤条件
@@ -175,10 +179,11 @@ consultantCtrl.admin.queryCombine = new Controller({
 // };
 
 // export
-exports.app = {
-  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantCtrl.app.queryCombine }) }
-}
-exports.admin = {
-  add: (req, res) => { handleRequest({ req, res, controller: consultantCtrl.admin.add }) },
-  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantCtrl.admin.queryCombine }) }
+// exports.admin = {
+//   add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.add }) },
+//   queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) }
+// }
+exports.common = {
+  add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) },
+  queryByTime: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.queryByTime }) }
 }
