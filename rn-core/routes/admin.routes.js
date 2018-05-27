@@ -50,6 +50,10 @@ router.all(`${path.calendar}/single`, controller.calendar.common.single);
 router.all(`${path.question}/add`, controller.question.common.add);
 router.all(`${path.question}/admin-query`, controller.question.admin.queryCombine);
 router.all(`${path.question}/update-status`, controller.question.admin.updateStatus);
-// router.all(`${path.question}/:_id`, controller.question.common.querySingle);
+
+// 匿名回答
+router.all(`${path.answer}/add`, controller.answer.common.add);
+router.all(`${path.answer}/admin-query`, controller.answer.admin.queryCombine);
+router.all(`${path.answer}/update-status`, controller.answer.admin.updateStatus);
 
 module.exports = router;

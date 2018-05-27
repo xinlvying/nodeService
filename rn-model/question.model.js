@@ -21,6 +21,9 @@ const questionSchema = new mongoose.Schema({
   // 问题状态 => 0：未审核；1：已审核通过；2：已审核，未通过
   status: { type: Number, default: 0 },
 
+  // 问题回答
+  answers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Answer' }],
+
   // 创建时间
   create_at: { type: Date, default: Date.now },
 

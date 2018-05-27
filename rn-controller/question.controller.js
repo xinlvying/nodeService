@@ -55,6 +55,7 @@ questionCtrl.app.list = new Controller({
       sort: { create_at: -1 },
       page: Number(page || 1),
       limit: Number(per_page || 10),
+      populate: ['answer']
     };
 
     Paginate({ status: 1 }, options, res, '问题列表获取成功！', '问题列表获取失败！');
@@ -70,7 +71,7 @@ questionCtrl.admin.queryCombine = new Controller({
       sort: { create_at: -1 },
       page: Number(body.page || 1),
       limit: Number(body.per_page || 10),
-      populate: ['answer'],
+      populate: ['answers']
     };
     let querys = {};
     for (let key of Object.keys(body)) {
@@ -78,7 +79,7 @@ questionCtrl.admin.queryCombine = new Controller({
         querys[key] = body[key];
       }
     }
-    Paginate(querys, options, res, '文章列表获取成功！', '文章列表获取失败！');
+    Paginate(querys, options, res, '问题列表获取成功！', '问题列表获取失败！');
   }
 });
 

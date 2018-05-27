@@ -48,6 +48,5 @@ router.all(`${path.question}/:_id`, controller.question.app.querySingle);
 
 // 匿名回答
 router.all(`${path.answer}/add`, controller.answer.common.add);
-router.all(`${path.answer}/question/:_id`, controller.answer.app.querySingleQuestionAnswer);
 
 module.exports = router;
