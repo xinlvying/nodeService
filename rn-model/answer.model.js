@@ -24,6 +24,10 @@ const answerSchema = new mongoose.Schema({
   // 创建时间
   create_at: { type: Date, default: Date.now },
 
+
+  // 最后修改日期
+  update_at: { type: Date, default: Date.now }
+
 });
 
 answerSchema.set('toObject', { getters: true });
@@ -36,6 +40,14 @@ answerSchema.plugin(autoIncrement.plugin, {
   startAt: 1,
   incrementBy: 1
 });
+
+
+// 时间更新
+answerSchema.pre('findOneAndUpdate', function (next) {
+  this.findOneAndUpdate({}, { update_at: Date.now() });
+  next();
+});
+
 
 const Answer = mongoose.model('Answer', answerSchema);
 module.exports = Answer;
