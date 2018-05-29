@@ -31,10 +31,10 @@ const consultRecordSchema = new mongoose.Schema({
   field: String,
 
   // 咨询周次
-  consult_week: String,
+  consult_week: { type: String, required: true },
 
   // 咨询星期
-  consult_weekday: String,
+  consult_weekday: { type: String, required: true },
 
   // 咨询日期
   consult_date: { type: Date, required: true },
