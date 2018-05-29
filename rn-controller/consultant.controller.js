@@ -46,13 +46,23 @@ consultantCtrl.app.queryCombine = new Controller({
   method: 'POST',
   callback: ({ body }, res) => {
     console.log(body);
+    // return false;
+
+    let querys = {};
+    for (let key of Object.keys(body)) {
+      if (key != 'week') {
+        querys[key] = body[key];
+      }
+    }
+
     // 请求
-    const find = Consultant.find({ ...body });
+    const find = Consultant.find({ ...querys });
     const promise = find.exec();
 
     promise
       .then(data => {
-        handleSuccess({ res, data, message: '咨询师列表获取成功' });
+        // handleSuccess({ res, data, message: '咨询师列表获取成功' });
+        handleError({ res, code: 500, message: '咨询师列表获取失败' });
       })
       .catch(err => {
         handleError({ res, err, message: '咨询师列表获取失败' });
@@ -60,10 +70,32 @@ consultantCtrl.app.queryCombine = new Controller({
   }
 });
 
+consultantCtrl.admin.queryCombine = new Controller({
+  method: 'POST',
+  callback: ({ body }, res) => {
+    // console.log(body);
+    // 过滤条件
+    const options = {
+      sort: { _id: -1 },
+      page: Number(body.page || 1),
+      limit: Number(body.per_page || 10),
+    };
+
+    let querys = {};
+    for (let key of Object.keys(body)) {
+      if (key != 'page' && key != 'per_page') {
+        querys[key] = body[key];
+      }
+    }
+
+    Paginate(querys, options, res);
+  }
+});
+
 consultantCtrl.admin.add = new Controller({
   method: 'POST',
   callback: ({ body: consultant }, res) => {
-    console.log(consultant)
+    // console.log(consultant)
     // 验证
     if (!consultant.name || !consultant.gender || !consultant.onduty_day ||
       !consultant.onduty_time || !consultant.description || !consultant.photo) {
@@ -93,26 +125,6 @@ consultantCtrl.admin.add = new Controller({
   }
 });
 
-consultantCtrl.admin.queryCombine = new Controller({
-  method: 'POST',
-  callback: ({ body }, res) => {
-    // 过滤条件
-    const options = {
-      sort: { _id: -1 },
-      page: Number(body.page || 1),
-      limit: Number(body.per_page || 10),
-    };
-
-    let querys = {};
-    for (let key of Object.keys(body)) {
-      if (key != 'page' && key != 'per_page') {
-        querys[key] = body[key];
-      }
-    }
-
-    Paginate(querys, options, res);
-  }
-})
 
 
 // // 批量删除分类

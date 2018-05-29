@@ -53,7 +53,7 @@ consultantRecord.common.queryByTime = new Controller({
     const promise = ConsultantRecord.find({ 'consult_date': { $gte: date } }).exec();
     promise
       .then(data => {
-        // console.log(data)
+        // // console.log(data)
         handleSuccess({ res, data, message: '咨询预约记录获取成功' });
       })
       .catch(err => {
@@ -65,7 +65,7 @@ consultantRecord.common.queryByTime = new Controller({
 consultantRecord.common.add = new Controller({
   method: 'POST',
   callback: ({ body: consultantRecord }, res) => {
-    console.log(consultantRecord)
+    // // console.log(consultantRecord)
     // 验证
     if (!consultantRecord.visitor_tel || !consultantRecord.consultant_id || !consultantRecord.consult_time ||
       !consultantRecord.consult_week || !consultantRecord.consult_weekday) {

@@ -44,7 +44,7 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
 calendar.admin.query = new Controller({
   method: 'POST',
   callback: ({ body }, res) => {
-    console.log(body);
+    // // console.log(body);
     // 过滤条件
     const options = {
       sort: { _id: -1 },
@@ -69,7 +69,7 @@ calendar.admin.add = new Controller({
   callback: ({ body: term }, res) => {
 
     // 验证
-    console.log(term);
+    // // console.log(term);
     if (!term.title || !term.begin_at || !term.end_at) {
       handleError({ res, message: '参数错误' });
       return false;
@@ -111,10 +111,10 @@ calendar.common.single = new Controller({
       if (terms && terms.length) {
         terms.map((term, index) => {
           if (term.end_at >= date) {
-            // console.log(term.begin_at, typeof (term.begin_at))
+            // // console.log(term.begin_at, typeof (term.begin_at))
             let ms = date.getTime() - term.begin_at.getTime();
             let week = Math.ceil(ms / (60 * 60 * 24 * 1000) / 7);
-            console.log(ms / (60 * 60 * 24 * 1000) / 7);
+            // // console.log(ms / (60 * 60 * 24 * 1000) / 7);
             result = { term, week: week };
           }
         })

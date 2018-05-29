@@ -43,11 +43,11 @@ function handleSendSms(phone, code) {
         let { Code } = res
         if (Code === 'OK') {
           //处理返回参数
-          // console.log(res);
+          // // console.log(res);
           resolve(res);
         }
       }, function (err) {
-        // console.log(err);
+        // // console.log(err);
         reject(err);
       });
   });
@@ -60,17 +60,17 @@ smsCtrl.app.getSmsCode = new Controller({
 
     // 生成6位验证码
     const code = generateCheckCode(6);
-    console.log(login_phone, code);
+    // console.log(login_phone, code);
 
     function newSmsRecord(login_phone, code) {
       return new Promise((resolve, reject) => {
         new Sms({ login_phone, sms_code: code }).save()
           .then(result => {
-            console.log(result);
+            // console.log(result);
             resolve(result);
           })
           .catch(err => {
-            // console.log(err);
+            // // console.log(err);
             reject(err);
           })
       });
@@ -79,7 +79,7 @@ smsCtrl.app.getSmsCode = new Controller({
     async function handleSendAndSaveSms(login_phone, code) {
       const sendResult = await handleSendSms(login_phone, code);
       const saveResult = await newSmsRecord(login_phone, code);
-      console.log(sendResult);
+      // console.log(sendResult);
     }
 
     handleSendAndSaveSms(login_phone, code)
@@ -101,7 +101,7 @@ smsCtrl.app.login = new Controller({
       return new Promise((resolve, reject) => {
         const promise = Sms.find({ login_phone }, { sms_code: 1 }).sort({ create_at: -1 }).limit(1).exec();
         promise.then(res => {
-          console.log(res, sms_code, res.includes(sms_code));
+          // console.log(res, sms_code, res.includes(sms_code));
           if (res[0].sms_code == sms_code) resolve();
           else reject('短信验证码错误');
         }).catch(err => {
@@ -122,7 +122,7 @@ smsCtrl.app.login = new Controller({
                 resolve(result);
               })
               .catch(err => {
-                console.log(err);
+                // console.log(err);
                 reject(err);
               })
           }
@@ -142,7 +142,7 @@ smsCtrl.app.login = new Controller({
         handleSuccess({ res, data: login_phone, message: '登录成功' });
       })
       .catch(err => {
-        console.log(err)
+        // console.log(err)
         handleError({ res, err, message: '登录失败' });
       })
   }

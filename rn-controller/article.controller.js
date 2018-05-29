@@ -68,7 +68,7 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
 const Find = (querys, option, res, successMsg = '操作成功', errMsg = '操作失败') => {
   Article.find(querys, option)
     .then(data => {
-      // console.log(data)
+      // // console.log(data)
       handleSuccess({ res, message: '文章获取成功', data });
     })
     .catch(err => handleError({ res, message: '文章获取失败', err }))
@@ -121,16 +121,16 @@ articleCtrl.common.querySingle = new Controller({
     // 将内容转换为markdown格式
     // Article.find(querys)
     //   .then(data => {
-    //     // console.log(data[0].content)
+    //     // // console.log(data[0].content)
     //     data[0].content = turndownService.turndown(data[0].content);
-    //     console.log(data[0])
+    //     // console.log(data[0])
     //     handleSuccess({ res, message: '文章获取成功', data: data[0] });
     //   })
     //   .catch(err => handleError({ res, message: '文章获取失败', err }))
 
     Article.findOne(querys).populate('category tag').exec()
       .then(data => {
-        // console.log(data)
+        // // console.log(data)
         // 每请求一次，浏览次数都要增加
         data.meta.views += 1;
         data.save();
@@ -178,14 +178,14 @@ articleCtrl.admin.publish = new Controller({
       new Article(article).save()
         .then((result = article) => {
           successCount++;
-          console.log({ success: successCount });
+          // console.log({ success: successCount });
           handleSuccess({ res, result, message: '文章发布成功' });
         })
         .catch(err => {
           errorCount++;
-          console.log({ err: errorCount });
+          // console.log({ err: errorCount });
 
-          // console.log(article.title)
+          // // console.log(article.title)
           handleError({ res, err, message: '文章发布失败' });
         })
     }
@@ -195,17 +195,17 @@ articleCtrl.admin.publish = new Controller({
     const find = Article.find({ title });
     const promise = find.exec();
     promise.then(articles => {
-      console.log(articles)
+      // console.log(articles)
       if (articles.length) {
         existCount++;
-        console.log({ exist: existCount });
+        // console.log({ exist: existCount });
         handleError({ res, message: "文章已存在！" });
       } else saveArticle();
     })
       .catch(err => {
-        // console.log(title);
+        // // console.log(title);
         errorCount++;
-        console.log({ findErr: errorCount });
+        // console.log({ findErr: errorCount });
 
         handleError({ res, err, message: '保存失败！' })
       })
@@ -230,7 +230,7 @@ articleCtrl.admin.changeStatus = new Controller({
         handleSuccess({ res, data, message: '操作成功' });
       })
       .catch(err => {
-        // console.log(err)
+        // // console.log(err)
         handleError({ res, err, message: '操作失败' });
       })
   }

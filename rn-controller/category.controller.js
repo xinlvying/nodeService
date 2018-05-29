@@ -96,7 +96,7 @@ categoryCtrl.admin.publish = new Controller({
     const promise = find.exec();
     promise
       .then(categories => {
-        console.log(categories.length);
+        // console.log(categories.length);
         categories.length && handleError({ res, message: 'category已被占用' });
         categories.length || saveCategory();
       })
