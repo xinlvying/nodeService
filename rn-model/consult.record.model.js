@@ -77,7 +77,7 @@ consultRecordSchema.plugin(autoIncrement.plugin, {
 
 // 时间更新
 consultRecordSchema.pre('findOneAndUpdate', function (next) {
-  this.findOneAndUpdate({}, { update_at: new Date(Date.now() - date.getTimezoneOffset() * 60 * 1000) });
+  this.findOneAndUpdate({}, { update_at: Date.now() });
   next();
 });
 

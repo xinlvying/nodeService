@@ -2,6 +2,7 @@
  * 咨询记录控制器
  */
 
+const SMSClient = require('@alicloud/sms-sdk')
 const Controller = require('../rn-utils/controller.generator');
 const { handleRequest, handleError, handleSuccess } = require('../rn-utils/handler');
 const authIsVerified = require('../rn-utils/authentication');
@@ -18,6 +19,39 @@ const consultantRecord = {
 const appQuerys = {
   status: 1,
   public: 1
+}
+
+const accessKeyId = config.SMSACCESSKEY.accessKeyId;
+
+const secretAccessKey = config.SMSACCESSKEY.secretAccessKey;
+
+// 发送短信
+function handleSendSms(phone, code) {
+  return new Promise((resolve, reject) => {
+    const templateParam = JSON.stringify({ code: code });
+
+    //初始化sms_client
+    let smsClient = new SMSClient({ accessKeyId, secretAccessKey });
+
+    //发送短信
+    smsClient.sendSMS({
+      PhoneNumbers: phone,
+      SignName: config.SMSACCESSKEY.signName,
+      TemplateCode: config.SMSACCESSKEY.TemplateCode,
+      TemplateParam: templateParam
+    })
+      .then(function (res) {
+        let { Code } = res
+        if (Code === 'OK') {
+          //处理返回参数
+          // // console.log(res);
+          resolve(res);
+        }
+      }, function (err) {
+        // // console.log(err);
+        reject(err);
+      });
+  });
 }
 
 const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '操作失败') => {
@@ -122,8 +156,33 @@ consultantRecord.admin.queryCombine = new Controller({
   }
 });
 
+consultantRecord.admin.updateStatus = new Controller({
+  method: 'PATCH',
+  callback: ({ body: { id, status } }, res) => {
+
+    // 验证
+    if (!id) {
+      handleError({ res, message: '缺少有效参数' });
+      return false;
+    };
+
+    let querys = { 'id': id };
+    let options = { new: true };
+
+    const promise = ConsultantRecord.findOneAndUpdate(querys, { $set: { status } }).exec();
+    promise.then(data => {
+      console.log(data);
+      handleSuccess({ res, data, message: '操作成功' });
+    }).catch(err => {
+      console.log(err);
+      handleError({ res, err, message: '操作失败' });
+    })
+  }
+});
+
 exports.admin = {
-  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) }
+  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) },
+  updateStatus: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.updateStatus }) }
 }
 exports.common = {
   add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) },
