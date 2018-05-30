@@ -18,6 +18,9 @@ const consultRecordSchema = new mongoose.Schema({
   // 来访人电话
   visitor_tel: { type: String, required: true, validate: /\S+/ },
 
+  // 来访人姓名
+  visitor_tel: String,
+
   // 来访人性别
   visitor_gender: String,
 
@@ -41,7 +44,7 @@ const consultRecordSchema = new mongoose.Schema({
 
   // 咨询时间
   consult_time: { type: String, required: true },
-  
+
   // 记录状态 => // 1未确认，2已确认，3已咨询，4已取消，5已更改咨询时间
   status: { type: Number, required: true, default: 1 },
 
@@ -49,7 +52,7 @@ const consultRecordSchema = new mongoose.Schema({
   create_at: { type: Date, default: Date.now },
 
   // 最后修改日期
-  update_at: { type: Date },
+  update_at: { type: Date, default: Date.now },
 
   // 备注
   remark: String,

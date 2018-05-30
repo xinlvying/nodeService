@@ -153,14 +153,6 @@ consultantCtrl.app.queryCombine = new Controller({
       .catch(err => {
         handleError({ res, err, message: '咨询师列表获取失败' });
       })
-
-    // promise
-    //   .then(data => {
-    //     handleSuccess({ res, data, message: '咨询师列表获取成功' });
-    //   })
-    //   .catch(err => {
-    //     handleError({ res, err, message: '咨询师列表获取失败' });
-    //   })
   }
 });
 

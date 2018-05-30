@@ -41,6 +41,12 @@ router.all('/upload', controller.upload);
 router.all(`${path.consultant}/add`, controller.consultant.admin.add);
 router.all(`${path.consultant}/admin-query`, controller.consultant.admin.queryCombine);
 
+// ConsultRecord
+router.all(`${path.consultRecord}/add`, controller.consultRecord.common.add);
+router.all(`${path.consultRecord}/admin-query`, controller.consultRecord.admin.queryCombine);
+// router.all(`${path.consultRecord}/update-status`, controller.question.admin.updateStatus);
+
+
 // Calendar
 router.all(`${path.calendar}/query`, controller.calendar.admin.query);
 router.all(`${path.calendar}/add`, controller.calendar.admin.add);

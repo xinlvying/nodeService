@@ -108,6 +108,7 @@ consultantRecord.admin.queryCombine = new Controller({
       sort: { _id: -1 },
       page: Number(body.page || 1),
       limit: Number(body.per_page || 10),
+      populate: ['consultant_id'],
     };
 
     let querys = {};
@@ -119,73 +120,11 @@ consultantRecord.admin.queryCombine = new Controller({
 
     Paginate(querys, options, res);
   }
-})
+});
 
-
-// // 批量删除分类
-// categoryCtrl.list.DELETE = ({ body: { categories } }, res) => {
-
-//   // 验证
-//   if (!categories || !categories.length) {
-//     handleError({ res, message: '缺少有效参数' });
-//     return false;
-//   };
-
-//   // 把所有pid为categories中任何一个id的分类分别提升到自己分类本身的PID分类或者null
-//   Category.remove({ '_id': { $in: categories } })
-//     .then(result => {
-//       handleSuccess({ res, result, message: '分类批量删除成功' });
-//     })
-//     .catch(err => {
-//       handleError({ res, err, message: '分类批量删除失败' });
-//     })
-// };
-
-// // 删除单个分类
-// categoryCtrl.item.DELETE = ({ params: { category_id } }, res) => {
-
-//   // delete category
-//   const deleteCategory = () => {
-//     return Category.findByIdAndRemove(category_id);
-//   };
-
-//   // delete pid
-//   const deletePid = category => {
-//     return new Promise((resolve, reject) => {
-//       Category.find({ pid: category_id })
-//         .then(categories => {
-//           // 如果没有子分类
-//           if (!categories.length) {
-//             resolve({ result: category });
-//             return false;
-//           };
-//           // 否则更改父分类的子分类
-//           let _category = Category.collection.initializeOrderedBulkOp();
-//           _category.find({ '_id': { $in: Array.from(categories, c => c._id) } }).update({ $set: { pid: category.pid || null } });
-//           _category.execute((err, data) => {
-//             err ? reject({ err }) : resolve({ result: category });
-//           })
-//         })
-//         .catch(err => reject({ err }))
-//     })
-//   };
-
-//   (async () => {
-//     let category = await deleteCategory();
-//     return await deletePid(category);
-//   })()
-//     .then(({ result }) => {
-//       handleSuccess({ res, result, message: '分类删除成功' });
-//       buildSiteMap();
-//     })
-//     .catch(({ err }) => handleError({ res, err, message: '分类删除失败' }));
-// };
-
-// export
-// exports.admin = {
-//   add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.add }) },
-//   queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) }
-// }
+exports.admin = {
+  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) }
+}
 exports.common = {
   add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) },
   queryByTime: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.queryByTime }) }

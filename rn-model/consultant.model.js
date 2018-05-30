@@ -24,6 +24,9 @@ const consultantSchema = new mongoose.Schema({
   // 咨询方向
   field: { type: String },
 
+  // 联系方式
+  tel: { type: String, required: true },
+
   // 值班时间
   onduty_time: [String],
 
