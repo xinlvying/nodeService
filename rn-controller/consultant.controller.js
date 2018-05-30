@@ -115,7 +115,11 @@ consultantCtrl.app.queryCombine = new Controller({
         } else {
           consultantList.map((consultant, index) => {
             // 根据咨询师ID筛选预约记录
-            let reservations = consultRecord.filter(record => { record.consultant_id == consultant._id });
+            let reservations = consultRecord.filter(
+              record => {
+                return record.consultant_id.toString() == consultant._id.toString();
+              });
+            // console.log(reservations);
 
             if (reservations.length == 2) {               // 存在两条预约记录时，均标记为已预约状态
               for (let [index, elem] of consultant.onduty_time.entries()) {

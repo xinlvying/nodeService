@@ -47,7 +47,7 @@ consultantRecord.common.queryByTime = new Controller({
   callback: ({ params: { consult_time } }, res) => {
     let date;
     if (consult_time) date = new Date(consult_time);
-    else handleError({res,message:'参数不能为空'});
+    else handleError({ res, message: '参数不能为空' });
     // 请求
 
     const promise = ConsultantRecord.find({ 'consult_date': { $gte: date } }).exec();
@@ -65,7 +65,7 @@ consultantRecord.common.queryByTime = new Controller({
 consultantRecord.common.add = new Controller({
   method: 'POST',
   callback: ({ body: consultantRecord }, res) => {
-    // // console.log(consultantRecord)
+    // console.log(consultantRecord);
     // 验证
     if (!consultantRecord.visitor_tel || !consultantRecord.consultant_id || !consultantRecord.consult_time ||
       !consultantRecord.consult_week || !consultantRecord.consult_weekday) {
@@ -87,9 +87,12 @@ consultantRecord.common.add = new Controller({
     let visitor_tel = consultantRecord.visitor_tel;
     let consultant_id = consultantRecord.consultant_id;
     let consult_time = consultantRecord.consult_time;
+    let consult_week = consultantRecord.consult_week;
 
-    ConsultantRecord.find({ visitor_tel, consultant_id, consult_time })
+    ConsultantRecord.find({ visitor_tel, consultant_id, consult_time, consult_week })
       .then(consultantRecord => {
+        // console.log(consultantRecord);
+
         consultantRecord.length && handleError({ res, message: "该预约记录已存在！" });
         consultantRecord.length || saveConsultantRecord();
       })
