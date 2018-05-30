@@ -115,6 +115,7 @@ calendar.common.single = new Controller({
             let ms = date.getTime() - term.begin_at.getTime();
             let week = Math.ceil(ms / (60 * 60 * 24 * 1000) / 7);
             // // console.log(ms / (60 * 60 * 24 * 1000) / 7);
+            global._CurrentWeek = week;
             result = { term, week: week };
           }
         })

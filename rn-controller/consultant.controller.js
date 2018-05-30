@@ -8,6 +8,7 @@ const authIsVerified = require('../rn-utils/authentication');
 const config = require('../app.config');
 
 const Consultant = require('../rn-model/consultant.model');
+const ConsultRecord = require('../rn-model/consult.record.model');
 
 const consultantCtrl = {
   app: {},
@@ -45,8 +46,7 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
 consultantCtrl.app.queryCombine = new Controller({
   method: 'POST',
   callback: ({ body }, res) => {
-    console.log(body);
-    // return false;
+    const { week } = body;
 
     let querys = {};
     for (let key of Object.keys(body)) {
@@ -55,18 +55,108 @@ consultantCtrl.app.queryCombine = new Controller({
       }
     }
 
-    // 请求
-    const find = Consultant.find({ ...querys });
-    const promise = find.exec();
+    const initConsultantList = async (week) => {
+      try {
+        // 获取当前周次的咨询记录
+        const queryConsultRecordPromise = ConsultRecord.find({ consult_week: week }).exec();
 
-    promise
+        // 获取咨询师列表
+        const queryConsultantListPromise = Consultant.find({ ...querys }).exec();
+
+        const [consultRecord, consultantList] = await Promise.all([queryConsultRecordPromise, queryConsultantListPromise]);
+
+        const today = new Date().getDay() ? new Date().getDay() : 7;
+
+        if (week == global._CurrentWeek) {
+          consultantList.map(consultant => {
+            // 咨询师值班日期过期时标记过期状态
+            if (consultant.onduty_day < today) {
+
+              // 遍历咨询师所有值班时间并标记状态
+              for (let [index, elem] of consultant.onduty_time.entries()) {
+                consultant.onduty_time[index] = { time: elem, available: false, remark: '已过期' };
+              }
+
+            } else if (consultant.onduty_day == today) {
+
+              // 遍历咨询师所有值班时间并标记状态
+              for (let [index, elem] of consultant.onduty_time.entries()) {
+                consultant.onduty_time[index] = { time: elem, available: false, remark: '请提前一天预约' };
+              }
+
+            } else {
+
+              // 根据咨询师ID筛选预约记录
+              let reservations = consultRecord.filter(
+                record => {
+                  return record.consultant_id.toString() == consultant._id.toString();
+                });
+
+              // console.log(reservations);
+
+              if (reservations.length == 2) {               // 存在两条预约记录时，均标记为已预约状态
+                for (let [index, elem] of consultant.onduty_time.entries()) {
+                  consultant.onduty_time[index] = { time: elem, available: false, remark: '已预约' };
+                }
+              } else if (reservations.length == 1) {        // 存在一条预约记录时，将其中一条标记为已预约状态
+                for (let [index, elem] of consultant.onduty_time.entries()) {
+                  if (elem == reservations[0].consult_time)
+                    consultant.onduty_time[index] = { time: elem, available: false, remark: '已预约' };
+                  else
+                    consultant.onduty_time[index] = { time: elem, available: true, remark: '' };
+                }
+              } else {                                      // 不存在预约记录时，均标记为可预约状态
+                for (let [index, elem] of consultant.onduty_time.entries()) {
+                  consultant.onduty_time[index] = { time: elem, available: true, remark: '' };
+                }
+              }
+            }
+          });
+        } else {
+          consultantList.map((consultant, index) => {
+            // 根据咨询师ID筛选预约记录
+            let reservations = consultRecord.filter(record => { record.consultant_id == consultant._id });
+
+            if (reservations.length == 2) {               // 存在两条预约记录时，均标记为已预约状态
+              for (let [index, elem] of consultant.onduty_time.entries()) {
+                consultant.onduty_time[index] = { time: elem, available: false, remark: '已预约' };
+              }
+            } else if (reservations.length == 1) {        // 存在一条预约记录时，将其中一条标记为已预约状态
+              for (let [index, elem] of consultant.onduty_time.entries()) {
+                if (elem == reservations[0].consult_time)
+                  consultant.onduty_time[index] = { time: elem, available: false, remark: '已预约' };
+                else
+                  consultant.onduty_time[index] = { time: elem, available: true, remark: '' };
+              }
+            } else {                                      // 不存在预约记录时，均标记为可预约状态
+              for (let [index, elem] of consultant.onduty_time.entries()) {
+                consultant.onduty_time[index] = { time: elem, available: true, remark: '' };
+              }
+            }
+          });
+        }
+
+        return consultantList;
+      } catch (e) {
+        handleError({ res, err: e, message: '咨询师列表获取失败' });
+      }
+    }
+
+    initConsultantList(week)
       .then(data => {
-        // handleSuccess({ res, data, message: '咨询师列表获取成功' });
-        handleError({ res, code: 500, message: '咨询师列表获取失败' });
+        handleSuccess({ res, data, message: '咨询师列表获取成功' });
       })
       .catch(err => {
         handleError({ res, err, message: '咨询师列表获取失败' });
       })
+
+    // promise
+    //   .then(data => {
+    //     handleSuccess({ res, data, message: '咨询师列表获取成功' });
+    //   })
+    //   .catch(err => {
+    //     handleError({ res, err, message: '咨询师列表获取失败' });
+    //   })
   }
 });
 
