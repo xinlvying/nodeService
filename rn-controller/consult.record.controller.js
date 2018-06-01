@@ -76,15 +76,15 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
     })
 }
 
-consultantRecord.common.queryByTime = new Controller({
+consultantRecord.admin.queryByDate = new Controller({
   method: 'GET',
-  callback: ({ params: { consult_time } }, res) => {
+  callback: ({ params: { consult_date } }, res) => {
     let date;
-    if (consult_time) date = new Date(consult_time);
+    if (consult_date) date = new Date(consult_date);
     else handleError({ res, message: '参数不能为空' });
     // 请求
 
-    const promise = ConsultantRecord.find({ 'consult_date': { $gte: date } }).exec();
+    const promise = ConsultantRecord.find({ 'consult_date': date }).exec();
     promise
       .then(data => {
         // // console.log(data)
@@ -182,9 +182,9 @@ consultantRecord.admin.updateStatus = new Controller({
 
 exports.admin = {
   queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) },
-  updateStatus: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.updateStatus }) }
+  updateStatus: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.updateStatus }) },
+  queryByDate: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryByDate }) }
 }
 exports.common = {
-  add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) },
-  queryByTime: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.queryByTime }) }
+  add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) }
 }

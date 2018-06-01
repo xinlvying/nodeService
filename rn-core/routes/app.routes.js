@@ -39,7 +39,6 @@ router.all(`${path.calendar}/single`, controller.calendar.common.single);
 
 // 咨询记录
 router.all(`${path.consultRecord}/add`, controller.consultRecord.common.add);
-router.all(`${path.consultRecord}/query-by-time/:consult_time`, controller.consultRecord.common.queryByTime);
 
 // 匿名问题
 router.all(`${path.question}/add`, controller.question.common.add);

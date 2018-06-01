@@ -106,17 +106,24 @@ calendar.common.single = new Controller({
     let date = time ? new Date(time) : new Date();
     let result = {};
 
+    // 查询当前所属学期
     const getTerms = Calendar.find({ 'begin_at': { $lte: date } }).exec();
     getTerms.then(terms => {
       if (terms && terms.length) {
         terms.map((term, index) => {
           if (term.end_at >= date) {
-            // // console.log(term.begin_at, typeof (term.begin_at))
+
+            // 计算当前周
             let ms = date.getTime() - term.begin_at.getTime();
             let week = Math.ceil(ms / (60 * 60 * 24 * 1000) / 7);
-            // // console.log(ms / (60 * 60 * 24 * 1000) / 7);
+
+            // 计算该学期总周数
+            let allMs = term.end_at.getTime() - term.begin_at.getTime();
+            let weeksTotalNum = Math.ceil(allMs / (60 * 60 * 24 * 1000) / 7);
+
             global._CurrentWeek = week;
-            result = { term, week: week };
+
+            result = { term, week: week, weeksTotalNum: weeksTotalNum };
           }
         })
       }

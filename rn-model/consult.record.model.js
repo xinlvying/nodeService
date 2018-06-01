@@ -19,7 +19,7 @@ const consultRecordSchema = new mongoose.Schema({
   visitor_tel: { type: String, required: true, validate: /\S+/ },
 
   // 来访人姓名
-  visitor_tel: String,
+  visitor_name: String,
 
   // 来访人性别
   visitor_gender: String,

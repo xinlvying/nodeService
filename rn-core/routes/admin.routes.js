@@ -45,6 +45,7 @@ router.all(`${path.consultant}/admin-query`, controller.consultant.admin.queryCo
 router.all(`${path.consultRecord}/add`, controller.consultRecord.common.add);
 router.all(`${path.consultRecord}/admin-query`, controller.consultRecord.admin.queryCombine);
 router.all(`${path.consultRecord}/update-status`, controller.consultRecord.admin.updateStatus);
+router.all(`${path.consultRecord}/query-by-time/:consult_date`, controller.consultRecord.admin.queryByDate);
 
 
 // Calendar
