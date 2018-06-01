@@ -70,7 +70,7 @@ answerCtrl.admin.queryCombine = new Controller({
 answerCtrl.common.add = new Controller({
   method: 'POST',
   callback: ({ body: answer }, res) => {
-    console.log(answer)
+    // console.log(answer)
     if (!answer.question || !answer.content) {
       handleError({ res, err: '缺少必要参数', message: '缺少必要参数' });
       return false;
@@ -95,7 +95,7 @@ answerCtrl.common.add = new Controller({
       return new Promise((reslove, reject) => {
         status == 1 && Question.update({ '_id': questionId }, { $push: { answers: answerId } })
           .then(data => {
-            console.log(data);
+            // console.log(data);
             reslove(data);
           })
           .catch(err => {
@@ -106,7 +106,7 @@ answerCtrl.common.add = new Controller({
 
     async function handleAddAndPushAnswer(answer) {
       const addResult = await handleSaveAnswer(answer);
-      // console.log(addResult);
+      // // console.log(addResult);
       let pushAnswerResult;
       if (addResult.status == 1)
         pushAnswerResult = await handlePushAnswer(answer.question, addResult._id, 1);
@@ -170,7 +170,7 @@ answerCtrl.admin.updateStatus = new Controller({
 
     handleUpdateAndPushAnswer(answerId, questionId, status)
       .then(data => {
-        console.log(data);
+        // console.log(data);
         handleSuccess({ res, data, message: '操作成功' });
       })
       .catch(err => {

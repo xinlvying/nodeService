@@ -2,6 +2,7 @@
  * 咨询记录控制器
  */
 
+const SMSClient = require('@alicloud/sms-sdk')
 const Controller = require('../rn-utils/controller.generator');
 const { handleRequest, handleError, handleSuccess } = require('../rn-utils/handler');
 const authIsVerified = require('../rn-utils/authentication');
@@ -18,6 +19,39 @@ const consultantRecord = {
 const appQuerys = {
   status: 1,
   public: 1
+}
+
+const accessKeyId = config.SMSACCESSKEY.accessKeyId;
+
+const secretAccessKey = config.SMSACCESSKEY.secretAccessKey;
+
+// 发送短信
+function handleSendSms(phone, code) {
+  return new Promise((resolve, reject) => {
+    const templateParam = JSON.stringify({ code: code });
+
+    //初始化sms_client
+    let smsClient = new SMSClient({ accessKeyId, secretAccessKey });
+
+    //发送短信
+    smsClient.sendSMS({
+      PhoneNumbers: phone,
+      SignName: config.SMSACCESSKEY.signName,
+      TemplateCode: config.SMSACCESSKEY.TemplateCode,
+      TemplateParam: templateParam
+    })
+      .then(function (res) {
+        let { Code } = res
+        if (Code === 'OK') {
+          //处理返回参数
+          // // console.log(res);
+          resolve(res);
+        }
+      }, function (err) {
+        // // console.log(err);
+        reject(err);
+      });
+  });
 }
 
 const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '操作失败') => {
@@ -42,18 +76,18 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
     })
 }
 
-consultantRecord.common.queryByTime = new Controller({
+consultantRecord.admin.queryByDate = new Controller({
   method: 'GET',
-  callback: ({ params: { consult_time } }, res) => {
+  callback: ({ params: { consult_date } }, res) => {
     let date;
-    if (consult_time) date = new Date(consult_time);
-    else handleError({res,message:'参数不能为空'});
+    if (consult_date) date = new Date(consult_date);
+    else handleError({ res, message: '参数不能为空' });
     // 请求
 
-    const promise = ConsultantRecord.find({ 'consult_date': { $gte: date } }).exec();
+    const promise = ConsultantRecord.find({ 'consult_date': date }).exec();
     promise
       .then(data => {
-        // console.log(data)
+        // // console.log(data)
         handleSuccess({ res, data, message: '咨询预约记录获取成功' });
       })
       .catch(err => {
@@ -65,7 +99,7 @@ consultantRecord.common.queryByTime = new Controller({
 consultantRecord.common.add = new Controller({
   method: 'POST',
   callback: ({ body: consultantRecord }, res) => {
-    console.log(consultantRecord)
+    // console.log(consultantRecord);
     // 验证
     if (!consultantRecord.visitor_tel || !consultantRecord.consultant_id || !consultantRecord.consult_time ||
       !consultantRecord.consult_week || !consultantRecord.consult_weekday) {
@@ -87,9 +121,12 @@ consultantRecord.common.add = new Controller({
     let visitor_tel = consultantRecord.visitor_tel;
     let consultant_id = consultantRecord.consultant_id;
     let consult_time = consultantRecord.consult_time;
+    let consult_week = consultantRecord.consult_week;
 
-    ConsultantRecord.find({ visitor_tel, consultant_id, consult_time })
+    ConsultantRecord.find({ visitor_tel, consultant_id, consult_time, consult_week })
       .then(consultantRecord => {
+        // console.log(consultantRecord);
+
         consultantRecord.length && handleError({ res, message: "该预约记录已存在！" });
         consultantRecord.length || saveConsultantRecord();
       })
@@ -105,6 +142,7 @@ consultantRecord.admin.queryCombine = new Controller({
       sort: { _id: -1 },
       page: Number(body.page || 1),
       limit: Number(body.per_page || 10),
+      populate: ['consultant_id'],
     };
 
     let querys = {};
@@ -116,74 +154,37 @@ consultantRecord.admin.queryCombine = new Controller({
 
     Paginate(querys, options, res);
   }
-})
+});
 
+consultantRecord.admin.updateStatus = new Controller({
+  method: 'PATCH',
+  callback: ({ body: { id, status } }, res) => {
 
-// // 批量删除分类
-// categoryCtrl.list.DELETE = ({ body: { categories } }, res) => {
+    // 验证
+    if (!id) {
+      handleError({ res, message: '缺少有效参数' });
+      return false;
+    };
 
-//   // 验证
-//   if (!categories || !categories.length) {
-//     handleError({ res, message: '缺少有效参数' });
-//     return false;
-//   };
+    let querys = { 'id': id };
+    let options = { new: true };
 
-//   // 把所有pid为categories中任何一个id的分类分别提升到自己分类本身的PID分类或者null
-//   Category.remove({ '_id': { $in: categories } })
-//     .then(result => {
-//       handleSuccess({ res, result, message: '分类批量删除成功' });
-//     })
-//     .catch(err => {
-//       handleError({ res, err, message: '分类批量删除失败' });
-//     })
-// };
+    const promise = ConsultantRecord.findOneAndUpdate(querys, { $set: { status } }).exec();
+    promise.then(data => {
+      console.log(data);
+      handleSuccess({ res, data, message: '操作成功' });
+    }).catch(err => {
+      console.log(err);
+      handleError({ res, err, message: '操作失败' });
+    })
+  }
+});
 
-// // 删除单个分类
-// categoryCtrl.item.DELETE = ({ params: { category_id } }, res) => {
-
-//   // delete category
-//   const deleteCategory = () => {
-//     return Category.findByIdAndRemove(category_id);
-//   };
-
-//   // delete pid
-//   const deletePid = category => {
-//     return new Promise((resolve, reject) => {
-//       Category.find({ pid: category_id })
-//         .then(categories => {
-//           // 如果没有子分类
-//           if (!categories.length) {
-//             resolve({ result: category });
-//             return false;
-//           };
-//           // 否则更改父分类的子分类
-//           let _category = Category.collection.initializeOrderedBulkOp();
-//           _category.find({ '_id': { $in: Array.from(categories, c => c._id) } }).update({ $set: { pid: category.pid || null } });
-//           _category.execute((err, data) => {
-//             err ? reject({ err }) : resolve({ result: category });
-//           })
-//         })
-//         .catch(err => reject({ err }))
-//     })
-//   };
-
-//   (async () => {
-//     let category = await deleteCategory();
-//     return await deletePid(category);
-//   })()
-//     .then(({ result }) => {
-//       handleSuccess({ res, result, message: '分类删除成功' });
-//       buildSiteMap();
-//     })
-//     .catch(({ err }) => handleError({ res, err, message: '分类删除失败' }));
-// };
-
-// export
-// exports.admin = {
-//   add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.add }) },
-//   queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) }
-// }
+exports.admin = {
+  queryCombine: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryCombine }) },
+  updateStatus: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.updateStatus }) },
+  queryByDate: (req, res) => { handleRequest({ req, res, controller: consultantRecord.admin.queryByDate }) }
+}
 exports.common = {
-  add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) },
-  queryByTime: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.queryByTime }) }
+  add: (req, res) => { handleRequest({ req, res, controller: consultantRecord.common.add }) }
 }

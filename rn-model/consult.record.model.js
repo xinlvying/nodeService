@@ -18,6 +18,9 @@ const consultRecordSchema = new mongoose.Schema({
   // 来访人电话
   visitor_tel: { type: String, required: true, validate: /\S+/ },
 
+  // 来访人姓名
+  visitor_name: String,
+
   // 来访人性别
   visitor_gender: String,
 
@@ -31,17 +34,17 @@ const consultRecordSchema = new mongoose.Schema({
   field: String,
 
   // 咨询周次
-  consult_week: String,
+  consult_week: { type: String, required: true },
 
   // 咨询星期
-  consult_weekday: String,
+  consult_weekday: { type: String, required: true },
 
   // 咨询日期
   consult_date: { type: Date, required: true },
 
   // 咨询时间
   consult_time: { type: String, required: true },
-  
+
   // 记录状态 => // 1未确认，2已确认，3已咨询，4已取消，5已更改咨询时间
   status: { type: Number, required: true, default: 1 },
 
@@ -49,7 +52,7 @@ const consultRecordSchema = new mongoose.Schema({
   create_at: { type: Date, default: Date.now },
 
   // 最后修改日期
-  update_at: { type: Date },
+  update_at: { type: Date, default: Date.now },
 
   // 备注
   remark: String,
@@ -74,7 +77,7 @@ consultRecordSchema.plugin(autoIncrement.plugin, {
 
 // 时间更新
 consultRecordSchema.pre('findOneAndUpdate', function (next) {
-  this.findOneAndUpdate({}, { update_at: new Date(Date.now() - date.getTimezoneOffset() * 60 * 1000) });
+  this.findOneAndUpdate({}, { update_at: Date.now() });
   next();
 });
 

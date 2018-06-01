@@ -4,8 +4,8 @@ const argv = require('yargs').argv;
 exports.MONGODB = {
   uri: `mongodb://www.sxin.tech:${argv.dbport || '27017'}/reactnative`,
   // uri: `mongodb://localhost:${argv.dbport || '27017'}/reactnative`,
-  username: argv.db_username || '',
-  password: argv.db_password || ''
+  username: argv.db_username || 'chunkyboy',
+  password: argv.db_password || 'dsx921018'
 }
 
 // 阿里云短信服务ACCESS_KEY_ID/ACCESS_KEY_SECRET
