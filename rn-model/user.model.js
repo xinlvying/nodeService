@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   // 用户类型 => 0：普通用户,1：管理员
   user_type: { type: Number, default: 0 },
 
-  // 用户类型 => 0：无效,1：有效
+  // 用户状态 => 0：无效,1：有效
   user_status: { type: Number, default: 1 },
 
   // 手机号
@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema({
 
   // 年级
   grade: { type: String, default: '' },
+
+  // 阅读偏好
+  preferences: [{
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+    scores: [Number]
+  }],
 
   // 学院
   college: { type: String, default: '' },

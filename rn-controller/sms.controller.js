@@ -14,7 +14,6 @@ const generateCheckCode = require('../rn-utils/checkcode.generator');
 const User = require('../rn-model/user.model');
 const Sms = require('../rn-model/sms.record.model');
 
-
 const smsCtrl = {
   app: {},
   admin: {}
@@ -43,11 +42,9 @@ function handleSendSms(phone, code) {
         let { Code } = res
         if (Code === 'OK') {
           //处理返回参数
-          // // console.log(res);
           resolve(res);
         }
       }, function (err) {
-        // // console.log(err);
         reject(err);
       });
   });
