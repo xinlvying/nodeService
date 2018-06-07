@@ -80,14 +80,14 @@ consultantRecord.admin.queryByDate = new Controller({
   method: 'GET',
   callback: ({ params: { consult_date } }, res) => {
     let date;
-    if (consult_date) date = new Date(consult_date);
+    if (consult_date) date = new Date(new Date(parseInt(consult_date)).toDateString());
     else handleError({ res, message: '参数不能为空' });
     // 请求
 
     const promise = ConsultantRecord.find({ 'consult_date': date }).exec();
     promise
       .then(data => {
-        // // console.log(data)
+        console.log(data)
         handleSuccess({ res, data, message: '咨询预约记录获取成功' });
       })
       .catch(err => {

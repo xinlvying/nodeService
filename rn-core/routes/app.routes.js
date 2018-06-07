@@ -25,7 +25,8 @@ router.all(`${path.banner}/:position`, controller.banner.app.querySingle);
 // Article
 router.all(`${path.article}`, controller.article.app.query);
 router.all(`${path.article}/category/:category_id`, controller.article.app.queryByCategoryId);
-router.all(`${path.article}/:article_id`, controller.article.common.querySingle);
+router.all(`${path.article}/:article_id`, controller.article.app.querySingle);
+router.all(`${path.article}/user/:user`, controller.article.app.queryByUserCollection);
 
 // Category
 router.all(`${path.category}`, controller.category.common.query);
@@ -47,5 +48,10 @@ router.all(`${path.question}/:_id`, controller.question.app.querySingle);
 
 // 匿名回答
 router.all(`${path.answer}/add`, controller.answer.common.add);
+
+// 文章阅读偏好
+router.all(`${path.userPreference}/add-collection`, controller.userPreference.app.addCollection);
+router.all(`${path.userPreference}/delete-collection`, controller.userPreference.app.deleteCollection);
+router.all(`${path.userPreference}/add-reading-record`, controller.userPreference.app.addReadingRecord);
 
 module.exports = router;

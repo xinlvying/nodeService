@@ -2,7 +2,7 @@
 // exports.tag = require('./tag.controller');
 // exports.like = require('./like.controller');
 // exports.auth = require('./auth.controller');
-// exports.music = require('./music.controller');
+exports.userPreference = require('./user.preference.controller');
 exports.upload = require('./qiniu.controller');
 exports.question = require('./question.controller');
 exports.answer = require('./answer.controller');

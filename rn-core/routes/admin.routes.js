@@ -31,7 +31,7 @@ router.all(`${path.category}/publish`, controller.category.admin.publish);
 router.all(`${path.article}/query`, controller.article.admin.queryCombine);
 router.all(`${path.article}/update-status`, controller.article.admin.changeStatus);
 router.all(`${path.article}/publish`, controller.article.admin.publish);
-router.all(`${path.article}/query/:article_id`, controller.article.common.querySingle);
+router.all(`${path.article}/query/:article_id`, controller.article.admin.querySingle);
 router.all(`${path.article}/update/:article_id`, controller.article.admin.update);
 
 // 

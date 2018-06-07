@@ -98,7 +98,6 @@ smsCtrl.app.login = new Controller({
       return new Promise((resolve, reject) => {
         const promise = Sms.find({ login_phone }, { sms_code: 1 }).sort({ create_at: -1 }).limit(1).exec();
         promise.then(res => {
-          // console.log(res, sms_code, res.includes(sms_code));
           if (res[0].sms_code == sms_code) resolve();
           else reject('短信验证码错误');
         }).catch(err => {
@@ -112,14 +111,13 @@ smsCtrl.app.login = new Controller({
       return new Promise((resolve, reject) => {
         const promise = User.find({ login_phone }).exec();
         promise.then(res => {
-          if (res.length) resolve();
+          if (res.length) resolve(res[0]);
           else {
             new User({ login_phone }).save()
               .then(result => {
                 resolve(result);
               })
               .catch(err => {
-                // console.log(err);
                 reject(err);
               })
           }
@@ -130,13 +128,13 @@ smsCtrl.app.login = new Controller({
     }
 
     async function handleUserLogin(login_phone, sms_code) {
-      await checkSmsCode(login_phone, sms_code);
-      await registerUser(login_phone);
+      let [checkResult, user] = await Promise.all([checkSmsCode(login_phone, sms_code), registerUser(login_phone)]);
+      return user;
     }
 
     handleUserLogin(login_phone, sms_code)
-      .then(() => {
-        handleSuccess({ res, data: login_phone, message: '登录成功' });
+      .then((user) => {
+        handleSuccess({ res, data: user, message: '登录成功' });
       })
       .catch(err => {
         // console.log(err)

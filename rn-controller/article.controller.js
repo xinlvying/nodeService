@@ -9,8 +9,9 @@ const config = require('../app.config');
 
 var TurndownService = require('turndown');
 
-var turndownService = new TurndownService()
+var turndownService = new TurndownService();
 
+const UserCollection = require('../rn-model/user.collection.model');
 const Article = require('../rn-model/article.model');
 
 const articleCtrl = {
@@ -57,27 +58,11 @@ const Paginate = (querys, options, res, successMsg = '操作成功', errMsg = '�
     })
 };
 
-/**
- * 
- * @param {*查询条件} querys 
- * @param {*返回字段筛选配置} option 
- * @param {*http返回体} res 
- * @param {*成功提示} successMsg 
- * @param {*失败提示} errMsg 
- */
-const Find = (querys, option, res, successMsg = '操作成功', errMsg = '操作失败') => {
-  Article.find(querys, option)
-    .then(data => {
-      // // console.log(data)
-      handleSuccess({ res, message: '文章获取成功', data });
-    })
-    .catch(err => handleError({ res, message: '文章获取失败', err }))
-}
-
 // 客户端分页获取文章列表
 articleCtrl.app.query = new Controller({
   method: 'GET',
   callback: ({ query: { page, per_page } }, res) => {
+
     // 过滤条件
     const options = {
       sort: { create_at: -1 },
@@ -97,6 +82,7 @@ articleCtrl.app.query = new Controller({
 articleCtrl.app.queryByCategoryId = new Controller({
   method: 'GET',
   callback: ({ params: { category_id }, query: { page, per_page } }, res) => {
+
     // 过滤条件
     const options = {
       sort: { _id: -1 },
@@ -111,30 +97,55 @@ articleCtrl.app.queryByCategoryId = new Controller({
   }
 });
 
+// 客户端根据用户收藏分页查询
+articleCtrl.app.queryByUserCollection = new Controller({
+  method: 'GET',
+  callback: ({ params: { user } }, res) => {
 
-// 通用-根据ID获取单个文章
-articleCtrl.common.querySingle = new Controller({
+    UserCollection.findOne({ user }).populate('articles')
+      .then(data => {
+        handleSuccess({ res, message: '文章获取成功', data });
+      })
+      .catch(err => handleError({ res, message: '文章获取失败', err }))
+  }
+});
+
+
+// app-根据ID获取单个文章
+articleCtrl.app.querySingle = new Controller({
   method: 'GET',
   callback: ({ params: { article_id } }, res) => {
-    let querys = { ...appQuerys, _id: article_id };
 
-    // 将内容转换为markdown格式
-    // Article.find(querys)
-    //   .then(data => {
-    //     // // console.log(data[0].content)
-    //     data[0].content = turndownService.turndown(data[0].content);
-    //     // console.log(data[0])
-    //     handleSuccess({ res, message: '文章获取成功', data: data[0] });
-    //   })
-    //   .catch(err => handleError({ res, message: '文章获取失败', err }))
+    let querys = { _id: article_id };
 
-    Article.findOne(querys).populate('category tag').exec()
+    Article.findOne(querys).populate('category tag')
       .then(data => {
-        // // console.log(data)
         // 每请求一次，浏览次数都要增加
         data.meta.views += 1;
         data.save();
-        data.content = turndownService.turndown(data.content);
+
+        let result = { ...data._doc };
+        // console.log(result);
+        result.content = turndownService.turndown(data.content);
+        // console.log(result)
+        handleSuccess({ res, message: '文章获取成功', data: result });
+      })
+      .catch(err => handleError({ res, message: '文章获取失败', err }))
+  }
+});
+
+// admin-根据ID获取单个文章
+articleCtrl.admin.querySingle = new Controller({
+  method: 'GET',
+  callback: ({ params: { article_id } }, res) => {
+    let querys = { _id: article_id };
+
+    Article.findOne(querys)
+      .then(data => {
+        // 每请求一次，浏览次数都要增加
+        // data.meta.views += 1;
+        // data.save();
+        // data.content = turndownService.turndown(data.content);
         handleSuccess({ res, message: '文章获取成功', data });
       })
       .catch(err => handleError({ res, message: '文章获取失败', err }))
@@ -177,15 +188,9 @@ articleCtrl.admin.publish = new Controller({
     const saveArticle = () => {
       new Article(article).save()
         .then((result = article) => {
-          successCount++;
-          // console.log({ success: successCount });
           handleSuccess({ res, result, message: '文章发布成功' });
         })
         .catch(err => {
-          errorCount++;
-          // console.log({ err: errorCount });
-
-          // // console.log(article.title)
           handleError({ res, err, message: '文章发布失败' });
         })
     }
@@ -195,18 +200,11 @@ articleCtrl.admin.publish = new Controller({
     const find = Article.find({ title });
     const promise = find.exec();
     promise.then(articles => {
-      // console.log(articles)
       if (articles.length) {
-        existCount++;
-        // console.log({ exist: existCount });
         handleError({ res, message: "文章已存在！" });
       } else saveArticle();
     })
       .catch(err => {
-        // // console.log(title);
-        errorCount++;
-        // console.log({ findErr: errorCount });
-
         handleError({ res, err, message: '保存失败！' })
       })
   }
@@ -222,15 +220,11 @@ articleCtrl.admin.changeStatus = new Controller({
       return false;
     };
 
-    // // 要改的数据
-    // let updatePart = {};
-
     Article.update({ 'id': { $in: id } }, { $set: { status } }, { multi: true })
       .then(data => {
         handleSuccess({ res, data, message: '操作成功' });
       })
       .catch(err => {
-        // // console.log(err)
         handleError({ res, err, message: '操作失败' });
       })
   }
@@ -249,9 +243,9 @@ articleCtrl.admin.update = new Controller({
     };
 
     // 修正信息
-    delete article.meta
-    delete article.create_at
-    delete article.update_at
+    // delete article.meta
+    // delete article.create_at
+    // delete article.update_at
 
     // 修改文章
     Article.findByIdAndUpdate(article_id, article, { new: true })
@@ -281,7 +275,3 @@ exports.admin = (({ admin }) => {
   }
   return res;
 })(articleCtrl);
-
-exports.common = {
-  querySingle: (req, res) => handleRequest({ req, res, controller: articleCtrl.common.querySingle })
-}

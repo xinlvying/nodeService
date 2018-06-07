@@ -70,7 +70,7 @@ answerCtrl.admin.queryCombine = new Controller({
 answerCtrl.common.add = new Controller({
   method: 'POST',
   callback: ({ body: answer }, res) => {
-    // console.log(answer)
+    console.log(answer)
     if (!answer.question || !answer.content) {
       handleError({ res, err: '缺少必要参数', message: '缺少必要参数' });
       return false;

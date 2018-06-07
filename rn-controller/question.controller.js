@@ -123,7 +123,7 @@ questionCtrl.app.querySingle = new Controller({
   method: 'GET',
   callback: ({ params: { _id } }, res) => {
 
-    Question.findOne({ _id }).exec()
+    Question.findOne({ _id }).populate('answers').exec()
       .then(data => {
         handleSuccess({ res, message: '匿名问题获取成功', data });
       })

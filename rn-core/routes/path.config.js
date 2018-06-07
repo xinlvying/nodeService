@@ -7,5 +7,6 @@ module.exports = {
   calendar: '/terms',
   consultRecord: '/consult-record',
   question: '/questions',
-  answer: '/answers'
+  answer: '/answers',
+  userPreference: '/user-preferences'
 }
