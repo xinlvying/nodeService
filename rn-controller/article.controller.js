@@ -13,6 +13,7 @@ var turndownService = new TurndownService();
 
 const UserCollection = require('../rn-model/user.collection.model');
 const Article = require('../rn-model/article.model');
+const Category = require('../rn-model/article.category.model');
 
 const articleCtrl = {
   app: {},
@@ -81,19 +82,68 @@ articleCtrl.app.query = new Controller({
 // 客户端根据文章类别ID分页查询
 articleCtrl.app.queryByCategoryId = new Controller({
   method: 'GET',
-  callback: ({ params: { category_id }, query: { page, per_page } }, res) => {
+  callback: ({ params: { category_code }, query: { page, per_page } }, res) => {
 
-    // 过滤条件
-    const options = {
-      sort: { _id: -1 },
-      page: Number(page || 1),
-      limit: Number(per_page || 10),
-      populate: ['category'],
+    let fetchCategoryId = function (category_code) {
+      return new Promise((resolve, reject) => {
+        Category.findOne({ code: category_code })
+          .then(category => {
+            resolve(category);
+          }).catch(err => {
+            reject(err);
+          })
+      })
     };
 
-    // 查询参数,默认查询已发布、公开文章
-    let querys = { ...appQuerys, category: category_id };
-    Paginate(querys, options, res, '文章列表获取成功！', '文章列表获取失败！');
+
+    let fetchArticleByCategoryId = function (category_id) {
+      return new Promise((resolve, reject) => {
+        // 过滤条件
+        const options = {
+          sort: { _id: -1 },
+          page: Number(page || 1),
+          limit: Number(per_page || 10),
+          populate: ['category'],
+        };
+
+        // 查询参数,默认查询已发布、公开文章
+        let querys = { ...appQuerys, category: category_id };
+
+        Article.paginate(querys, options)
+          .then(articles => {
+            resolve(articles);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      })
+    }
+
+    let fetchData = async function (category_code) {
+      let category = await fetchCategoryId(category_code);
+      let articles = await fetchArticleByCategoryId(category._id);
+      return articles;
+    }
+
+    fetchData(category_code)
+      .then(result => {
+        handleSuccess({
+          res,
+          message: '文章获取成功',
+          data: {
+            pagination: {
+              total: result.total,
+              current_page: result.page,
+              total_page: result.pages,
+              per_page: result.limit
+            },
+            data: result.docs
+          }
+        })
+      })
+      .catch(err => {
+        handleError({ err, message: '获取文章失败！' })
+      })
   }
 });
 

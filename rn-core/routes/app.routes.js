@@ -24,7 +24,7 @@ router.all(`${path.banner}/:position`, controller.banner.app.querySingle);
 
 // Article
 router.all(`${path.article}`, controller.article.app.query);
-router.all(`${path.article}/category/:category_id`, controller.article.app.queryByCategoryId);
+router.all(`${path.article}/category/:category_code`, controller.article.app.queryByCategoryId);
 router.all(`${path.article}/:article_id`, controller.article.app.querySingle);
 router.all(`${path.article}/user/:user`, controller.article.app.queryByUserCollection);
 

@@ -21,14 +21,14 @@ const appQuerys = {
   public: 1
 }
 
-const accessKeyId = config.SMSACCESSKEY.accessKeyId;
+const accessKeyId = config.CONSULT_SMSACCESSKEY.accessKeyId;
 
-const secretAccessKey = config.SMSACCESSKEY.secretAccessKey;
+const secretAccessKey = config.CONSULT_SMSACCESSKEY.secretAccessKey;
 
 // 发送短信
-function handleSendSms(phone, code) {
+function handleSendSms(phone, paramObj) {
   return new Promise((resolve, reject) => {
-    const templateParam = JSON.stringify({ code: code });
+    const templateParam = JSON.stringify(paramObj);
 
     //初始化sms_client
     let smsClient = new SMSClient({ accessKeyId, secretAccessKey });
@@ -36,8 +36,8 @@ function handleSendSms(phone, code) {
     //发送短信
     smsClient.sendSMS({
       PhoneNumbers: phone,
-      SignName: config.SMSACCESSKEY.signName,
-      TemplateCode: config.SMSACCESSKEY.TemplateCode,
+      SignName: config.CONSULT_SMSACCESSKEY.signName,
+      TemplateCode: config.CONSULT_SMSACCESSKEY.TemplateCode,
       TemplateParam: templateParam
     })
       .then(function (res) {
@@ -171,8 +171,25 @@ consultantRecord.admin.updateStatus = new Controller({
 
     const promise = ConsultantRecord.findOneAndUpdate(querys, { $set: { status } }).exec();
     promise.then(data => {
-      console.log(data);
-      handleSuccess({ res, data, message: '操作成功' });
+      // console.log(data);
+      let option;
+      if (status == 2) option = '确认';
+      if (status == 3) option = '咨询完成';
+      if (status == 4) option = '取消';
+      let remark = status == 2 ? '按时到场' : '悉知';
+      let param = {
+        consult_week: data.consult_week,
+        consult_weekday: data.consult_weekday,
+        consult_time: data.consult_time,
+        option: option,
+        remark: remark
+      }
+      handleSendSms(data.visitor_tel, param)
+        .then(data => {
+          handleSuccess({ res, data, message: '操作成功' });
+        }).catch(err => {
+          handleError({ res, err, message: '操作失败' });
+        })
     }).catch(err => {
       console.log(err);
       handleError({ res, err, message: '操作失败' });

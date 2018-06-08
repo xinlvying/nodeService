@@ -16,6 +16,14 @@ exports.SMSACCESSKEY = {
   TemplateCode: 'SMS_133870008'
 }
 
+// 阿里云短信服务ACCESS_KEY_ID/ACCESS_KEY_SECRET
+exports.CONSULT_SMSACCESSKEY = {
+  accessKeyId: 'LTAIrbtk4IP8sYKo',
+  secretAccessKey: 'elHxjpusPFq11amYNDKri8zQA6yGB3',
+  signName: '心理之家',
+  TemplateCode: 'SMS_136161597'
+}
+
 exports.QINIU = {
   accessKey: "yaQDWnibcVH3GRtmYReVzrafk-8deAx1KR_Q5Nz6",
   secretKey: "OYX7QwY4u-LLnEYvHNXyJwFfGFvQXer1CDTA-EA-",
